@@ -1,0 +1,46 @@
+name: Deployment
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python_version: [3.6.10]
+        # python_version: [3.5.7, 3.6.10, 3.7.5, 3.8.2]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Django aws eb deployment
+      uses: joel-hanson/django-aws-eb-deploy@V1.1
+      with:
+        python_version: ${{ matrix.python_version }}
+        aws_access_key_id: ${{ secrets.aws_access_key_id }}
+        aws_secret_access_key: ${{ secrets.aws_secret_access_key }}
+        django_path: .
+        unit_testing: true
+        deploy: true
+        security_check: true
+
+    - name: Coverage report artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: coverage report
+        path: output/coverage_report.txt
+
+    - name: Coverage report artifacts if failed
+      uses: actions/upload-artifact@v1
+      if: failure()
+      with:
+        name: coverage report if failed
+        path: output/coverage_report.txt
+
+    - name: Security check report artifacts
+      uses: actions/upload-artifact@v1
+      if: failure()
+      with:
+        name: bandit
+        path: output/security_report.txt

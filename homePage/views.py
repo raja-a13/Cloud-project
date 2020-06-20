@@ -28,6 +28,7 @@ def test(request):
                 'link':link,
             }
         )
+        args = {}
         args['link'] = link
         return render(request,'Link.html',args)
 def home(request):

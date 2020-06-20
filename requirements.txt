@@ -1,0 +1,3 @@
+django
+awscli
+boto3
